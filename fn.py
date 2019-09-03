@@ -103,9 +103,9 @@ def vis_frame_fast(frame, im_res, format='coco'):
         p_color = [(0, 255, 255), (0, 191, 255),(0, 255, 102),(0, 77, 255), (0, 255, 0), #Nose, LEye, REye, LEar, REar
                     (77,255,255), (77, 255, 204), (77,204,255), (191, 255, 77), (77,191,255), (191, 255, 77), #LShoulder, RShoulder, LElbow, RElbow, LWrist, RWrist
                     (204,77,255), (77,255,204), (191,77,255), (77,255,191), (127,77,255), (77,255,127), (0, 255, 255)] #LHip, RHip, LKnee, Rknee, LAnkle, RAnkle, Neck
-        line_color = [(0, 215, 255), (0, 255, 204), (0, 134, 255), (0, 255, 50), 
-                    (77,255,222), (77,196,255), (77,135,255), (191,255,77), (77,255,77), 
-                    (77,222,255), (255,156,127), 
+        line_color = [(0, 215, 255), (0, 255, 204), (0, 134, 255), (0, 255, 50),
+                    (77,255,222), (77,196,255), (77,135,255), (191,255,77), (77,255,77),
+                    (77,222,255), (255,156,127),
                     (0,127,255), (255,127,77), (0,77,255), (255,77,36)]
     elif format == 'mpii':
         l_pair = [
@@ -140,7 +140,7 @@ def vis_frame_fast(frame, im_res, format='coco'):
     return img
 
 
-def vis_frame(frame, im_res, format='coco'):
+def vis_frame(frame, im_res, boxes, format='coco'):
     '''
     frame: frame image
     im_res: im_res of predictions
@@ -159,9 +159,9 @@ def vis_frame(frame, im_res, format='coco'):
         p_color = [(0, 255, 255), (0, 191, 255),(0, 255, 102),(0, 77, 255), (0, 255, 0), #Nose, LEye, REye, LEar, REar
                     (77,255,255), (77, 255, 204), (77,204,255), (191, 255, 77), (77,191,255), (191, 255, 77), #LShoulder, RShoulder, LElbow, RElbow, LWrist, RWrist
                     (204,77,255), (77,255,204), (191,77,255), (77,255,191), (127,77,255), (77,255,127), (0, 255, 255)] #LHip, RHip, LKnee, Rknee, LAnkle, RAnkle, Neck
-        line_color = [(0, 215, 255), (0, 255, 204), (0, 134, 255), (0, 255, 50), 
-                    (77,255,222), (77,196,255), (77,135,255), (191,255,77), (77,255,77), 
-                    (77,222,255), (255,156,127), 
+        line_color = [(0, 215, 255), (0, 255, 204), (0, 134, 255), (0, 255, 50),
+                    (77,255,222), (77,196,255), (77,135,255), (191,255,77), (77,255,77),
+                    (77,222,255), (255,156,127),
                     (0,127,255), (255,127,77), (0,77,255), (255,77,36)]
     elif format == 'mpii':
         l_pair = [
@@ -176,13 +176,23 @@ def vis_frame(frame, im_res, format='coco'):
 
     img = frame
     height,width = img.shape[:2]
+
+    # Draw bounding boxes
+    try:
+        if boxes is not None:
+            cv2.rectangle(img, (boxes[0][0], boxes[0][1]), (boxes[0][2], boxes[0][3]), (255,0,0), 1);
+    except:
+        import ipdb; ipdb.set_trace()
+
     img = cv2.resize(img,(int(width/2), int(height/2)))
+
     for human in im_res:
         part_line = {}
         kp_preds = human['keypoints']
         kp_scores = human['kp_score']
         kp_preds = torch.cat((kp_preds, torch.unsqueeze((kp_preds[5,:]+kp_preds[6,:])/2,0)))
         kp_scores = torch.cat((kp_scores, torch.unsqueeze((kp_scores[5,:]+kp_scores[6,:])/2,0)))
+
         # Draw keypoints
         for n in range(kp_scores.shape[0]):
             if kp_scores[n] <= 0.05:
@@ -194,6 +204,7 @@ def vis_frame(frame, im_res, format='coco'):
             # Now create a mask of logo and create its inverse mask also
             transparency = max(0, min(1, kp_scores[n]))
             img = cv2.addWeighted(bg, transparency, img, 1-transparency, 0)
+
         # Draw limbs
         for i, (start_p, end_p) in enumerate(l_pair):
             if start_p in part_line and end_p in part_line:
@@ -213,6 +224,9 @@ def vis_frame(frame, im_res, format='coco'):
                 #cv2.line(bg, start_xy, end_xy, line_color[i], (2 * (kp_scores[start_p] + kp_scores[end_p])) + 1)
                 transparency = max(0, min(1, 0.5*(kp_scores[start_p] + kp_scores[end_p])))
                 img = cv2.addWeighted(bg, transparency, img, 1-transparency, 0)
+
+
+
     img = cv2.resize(img,(width,height),interpolation=cv2.INTER_CUBIC)
     return img
 
