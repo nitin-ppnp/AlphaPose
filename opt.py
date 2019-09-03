@@ -4,6 +4,8 @@ import torch
 parser = argparse.ArgumentParser(description='PyTorch AlphaPose Training')
 
 "----------------------------- General options -----------------------------"
+parser.add_argument('--machine', default='default', type=str,
+                    help='ROS machine')
 parser.add_argument('--expID', default='default', type=str,
                     help='Experiment ID')
 parser.add_argument('--dataset', default='coco', type=str,

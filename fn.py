@@ -4,7 +4,7 @@ import os
 import collections
 from torch._six import string_classes, int_classes
 import cv2
-from opt import opt
+from .opt import opt
 from tqdm import tqdm
 import time
 import matplotlib.pyplot as plt
@@ -117,9 +117,8 @@ def vis_frame_fast(frame, im_res, format='coco'):
     else:
         NotImplementedError
 
-    im_name = im_res['imgname'].split('/')[-1]
     img = frame
-    for human in im_res['result']:
+    for human in im_res:
         part_line = {}
         kp_preds = human['keypoints']
         kp_scores = human['kp_score']
@@ -175,11 +174,10 @@ def vis_frame(frame, im_res, format='coco'):
     else:
         raise NotImplementedError
 
-    im_name = im_res['imgname'].split('/')[-1]
     img = frame
     height,width = img.shape[:2]
     img = cv2.resize(img,(int(width/2), int(height/2)))
-    for human in im_res['result']:
+    for human in im_res:
         part_line = {}
         kp_preds = human['keypoints']
         kp_scores = human['kp_score']

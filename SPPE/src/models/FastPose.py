@@ -3,7 +3,7 @@ from torch.autograd import Variable
 
 from .layers.SE_Resnet import SEResnet
 from .layers.DUC import DUC
-from opt import opt
+from ....opt import opt
 
 
 def createModel():
@@ -25,7 +25,7 @@ class FastPose(nn.Module):
         self.conv_out = nn.Conv2d(
             self.DIM, opt.nClasses, kernel_size=3, stride=1, padding=1)
 
-    def forward(self, x: Variable):
+    def forward(self, x):
         out = self.preact(x)
         out = self.suffle1(out)
         out = self.duc1(out)

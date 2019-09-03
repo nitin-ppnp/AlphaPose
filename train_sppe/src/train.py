@@ -28,7 +28,8 @@ def train(train_loader, m, criterion, optimizer, writer):
         inps = inps.cuda().requires_grad_()
         labels = labels.cuda()
         setMask = setMask.cuda()
-        out = m(inps)
+        
+        out = m(inps)[:,:17]
 
         loss = criterion(out.mul(setMask), labels)
 
@@ -73,11 +74,11 @@ def valid(val_loader, m, criterion, optimizer, writer):
         setMask = setMask.cuda()
 
         with torch.no_grad():
-            out = m(inps)
+            out = m(inps)[:,:17]
 
             loss = criterion(out.mul(setMask), labels)
 
-            flip_out = m(flip(inps))
+            flip_out = m(flip(inps))[:,:17]
             flip_out = flip(shuffleLR(flip_out, val_loader.dataset))
 
             out = (flip_out + out) / 2

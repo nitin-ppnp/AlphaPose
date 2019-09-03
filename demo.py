@@ -55,6 +55,7 @@ if __name__ == "__main__":
     if args.fast_inference:
         pose_model = InferenNet_fast(4 * 1 + 1, pose_dataset)
     else:
+        import ipdb; ipdb.set_trace()
         pose_model = InferenNet(4 * 1 + 1, pose_dataset)
     pose_model.cuda()
     pose_model.eval()

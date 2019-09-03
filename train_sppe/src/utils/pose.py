@@ -105,6 +105,7 @@ def generateSampleBox(img_path, bndbox, part, nJoints, imgset, scale_factor, dat
 
     inputResH, inputResW = opt.inputResH, opt.inputResW
     outputResH, outputResW = opt.outputResH, opt.outputResW
+    
 
     inp = cropBox(img, upLeft, bottomRight, inputResH, inputResW)
 

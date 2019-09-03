@@ -8,11 +8,11 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 try:
-    from util import count_parameters as count
-    from util import convert2cpu as cpu
+    from .util import count_parameters as count
+    from .util import convert2cpu as cpu
 except ImportError:
-    from yolo.util import count_parameters as count
-    from yolo.util import convert2cpu as cpu
+    from .yolo.util import count_parameters as count
+    from .yolo.util import convert2cpu as cpu
 from PIL import Image, ImageDraw
 
 
@@ -38,7 +38,8 @@ def prep_image(img, inp_dim):
     Returns a Variable
     """
 
-    orig_im = cv2.imread(img)
+    # orig_im = cv2.imread(img)
+    orig_im = img
     dim = orig_im.shape[1], orig_im.shape[0]
     img = (letterbox_image(orig_im, (inp_dim, inp_dim)))
     img_ = img[:, :, ::-1].transpose((2, 0, 1)).copy()

@@ -128,19 +128,28 @@ def transformBoxInvert(pt, ul, br, inpH, inpW, resH, resW):
 
 
 def cropBox(img, ul, br, resH, resW):
-    ul = ul.int()
-    br = (br - 1).int()
+    ul = ul.int().data.cpu().numpy()
+    br = (br - 1).int().data.cpu().numpy()
     # br = br.int()
     lenH = max((br[1] - ul[1]).item(), (br[0] - ul[0]).item() * resH / resW)
     lenW = lenH * resW / resH
     if img.dim() == 2:
         img = img[np.newaxis, :]
-
+    
     box_shape = [br[1] - ul[1], br[0] - ul[0]]
     pad_size = [(lenH - box_shape[0]) // 2, (lenW - box_shape[1]) // 2]
     # Padding Zeros
-    img[:, :ul[1], :], img[:, :, :ul[0]] = 0, 0
-    img[:, br[1] + 1:, :], img[:, :, br[0] + 1:] = 0, 0
+
+    # print(ul)
+    # print(img.shape)
+    # if(ul[0]==0 or ul[1]==0):
+    #     import ipdb;ipdb.set_trace()
+
+    if (ul[0]>0 and ul[1]>0):
+        img[:, :ul[1], :], img[:, :, :ul[0]] = 0, 0
+    if (br[0]<img.shape[2]-1 and br[1]<img.shape[1]-1):
+        img[:, br[1] + 1:, :], img[:, :, br[0] + 1:] = 0, 0
+
 
     src = np.zeros((3, 2), dtype=np.float32)
     dst = np.zeros((3, 2), dtype=np.float32)

@@ -1,6 +1,6 @@
-from opt import opt
+from ....opt import opt
 try:
-    from utils.img import transformBoxInvert, transformBoxInvert_batch, findPeak, processPeaks
+    from .img import transformBoxInvert, transformBoxInvert_batch, findPeak, processPeaks
 except ImportError:
     from SPPE.src.utils.img import transformBoxInvert, transformBoxInvert_batch, findPeak, processPeaks
 import torch
@@ -135,8 +135,11 @@ def getPrediction(hms, pt1, pt2, inpH, inpW, resH, resW):
             hm = hms[i][j]
             pX, pY = int(round(float(preds[i][j][0]))), int(round(float(preds[i][j][1])))
             if 0 < pX < opt.outputResW - 1 and 0 < pY < opt.outputResH - 1:
-                diff = torch.Tensor(
-                    (hm[pY][pX + 1] - hm[pY][pX - 1], hm[pY + 1][pX] - hm[pY - 1][pX]))
+                try:
+                    diff = torch.Tensor(
+                        (hm[pY][pX + 1] - hm[pY][pX - 1], hm[pY + 1][pX] - hm[pY - 1][pX]))
+                except:
+                    import ipdb; ipdb.set_trace()
                 preds[i][j] += diff.sign() * 0.25
     preds += 0.2
 
